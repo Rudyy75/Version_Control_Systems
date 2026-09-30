@@ -4,7 +4,7 @@ from core.index import load_index
 from core.objects import hash_object
 
 
-def status() -> None:
+def status():
     """Show modified, deleted, and untracked files."""
     index = load_index()
     entries = index["entries"]

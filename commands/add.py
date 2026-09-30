@@ -5,7 +5,7 @@ from core.index import load_index, save_index
 from core.objects import hash_object
 
 
-def add(file_paths: list[str]) -> None:
+def add(file_paths: list[str]):
     """Store files as blobs and add them to the staging area."""
     index = load_index()
 

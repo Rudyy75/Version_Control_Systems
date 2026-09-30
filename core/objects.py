@@ -7,7 +7,7 @@ MYGIT_DIR = Path(".mygit")
 OBJECTS_DIR = MYGIT_DIR / "objects"
 
 
-def hash_object(data: bytes, obj_type: str = "blob", write: bool = True) -> str:
+def hash_object(data: bytes, obj_type: str = "blob", write: bool = True):
     """Hash an object and optionally store its compressed representation."""
     header = f"{obj_type} {len(data)}\0".encode()
     full_object = header + data
@@ -23,7 +23,7 @@ def hash_object(data: bytes, obj_type: str = "blob", write: bool = True) -> str:
     return object_hash
 
 
-def read_object(object_hash: str) -> tuple[str, bytes]:
+def read_object(object_hash: str):
     """Read an object and return its type and unwrapped content."""
     object_path = OBJECTS_DIR / object_hash[:2] / object_hash[2:]
     full_object = zlib.decompress(object_path.read_bytes())

@@ -2,7 +2,7 @@ from core.objects import read_object
 from core.refs import get_head_commit
 
 
-def log() -> None:
+def log():
     """Print commits from the current branch, newest first."""
     current_hash = get_head_commit()
 

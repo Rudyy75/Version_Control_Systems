@@ -4,7 +4,7 @@ from pathlib import Path
 MYGIT_DIR = Path(".mygit")
 
 
-def init() -> None:
+def init():
     """Create the metadata directories and default branch pointer."""
     (MYGIT_DIR / "objects").mkdir(parents=True, exist_ok=True)
     (MYGIT_DIR / "refs" / "heads").mkdir(parents=True, exist_ok=True)

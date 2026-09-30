@@ -7,7 +7,7 @@ from core.objects import hash_object
 from core.refs import get_current_branch, get_head_commit, update_ref
 
 
-def signature() -> str:
+def signature():
     """Build the author and committer signature for this commit."""
     username = getpass.getuser()
     timestamp = int(time.time())
@@ -15,7 +15,7 @@ def signature() -> str:
     return f"{username} <{username}@localhost> {timestamp} {timezone}"
 
 
-def commit(message: str) -> str:
+def commit(message: str):
     """Create a tree and commit from the current staging area."""
     index = load_index()
     tree_entries = []
