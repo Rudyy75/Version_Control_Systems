@@ -1,7 +1,9 @@
 import argparse
 
 from commands.add import add
+from commands.branch import branch
 from commands.commit import commit
+from commands.checkout import checkout
 from commands.init import init
 from commands.log import log
 from commands.status import status
@@ -17,6 +19,12 @@ def main():
 	add_parser = subparsers.add_parser("add")
 	add_parser.add_argument("files", nargs="+")
 
+	branch_parser = subparsers.add_parser("branch")
+	branch_parser.add_argument("name", nargs="?")
+
+	checkout_parser = subparsers.add_parser("checkout")
+	checkout_parser.add_argument("name")
+
 	commit_parser = subparsers.add_parser("commit")
 	commit_parser.add_argument("-m", "--message", required=True)
 
@@ -27,6 +35,10 @@ def main():
 
 	if args.command == "add":
 		add(args.files)
+	elif args.command == "branch":
+		branch(args.name)
+	elif args.command == "checkout":
+		checkout(args.name)
 	elif args.command == "commit":
 		commit(args.message)
 	elif args.command == "log":
