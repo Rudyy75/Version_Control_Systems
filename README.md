@@ -79,7 +79,6 @@ Reports:
 
 - `new file staged`: a file is staged for the first time
 - `modified in index`: a committed file has staged changes
-- `deleted from index`: a committed file is staged for removal
 - `modified`: an indexed file has different content on disk
 - `deleted`: an indexed file no longer exists on disk
 - `untracked`: a file exists on disk but is not in the index
@@ -174,13 +173,43 @@ python path\to\mygit\mygit.py add file.txt
 python path\to\mygit\mygit.py commit -m "update file"
 ```
 
+## Demonstration Walkthrough
+
+The following sequence can be used to demonstrate the implementation. Each step
+shows a different part of the client:
+
+1. Run `init` in an empty directory. This creates the `.mygit` metadata
+   directory, including `HEAD`, object storage, and the `main` branch reference.
+2. Create files in nested directories and run `add` on each file. MyGit hashes
+   their contents as blobs and records the paths and hashes in the JSON index.
+3. Run `status` before the first commit. The output `new file staged` confirms
+   that the files are in the staging area.
+4. Run `commit -m "initial nested commit"` and then `log`. The commit references
+   a root tree, which references nested trees for directories such as `src` and
+   `src/utils`.
+5. Modify a tracked file without staging it and run `status`. The output
+   `modified` identifies an unstaged working-directory change.
+6. Run `add` again and run `status`. The output `modified in index` identifies a
+   staged change. After committing, an empty status output means the working
+   directory and index match the latest commit.
+7. Create a branch with `branch feature`, list branches with `branch`, and switch
+   using `checkout feature`. The `*` marker identifies the current branch.
+8. Commit a different version of a file on the feature branch. Switching between
+   `main` and `feature` restores the version belonging to each branch.
+9. Make an unstaged change and try to checkout another branch. MyGit refuses with
+   `local changes would be overwritten`. It also refuses checkout when staged
+   changes have not been committed.
+10. Delete a tracked file and run `status`. The output `deleted` reports the
+    working-directory deletion. This simplified client detects the deletion but
+    does not currently provide a separate `rm` command for staging it.
+
+This walkthrough is also suitable as a screen-recording outline. The commands
+may be run manually so that each output can be explained while demonstrating the
+corresponding internal operation.
+
 ## Current Limitations
 
 - The CLI currently expects file paths for `add`; recursive directory staging is not implemented.
+- File deletion is detected by `status`, but there is no separate `rm` command for staging deletions.
 - Checkout supports named branches but not detached `HEAD` mode.
-- Merge, conflict resolution, rename detection, and remote repositories are not implemented.
-
-- The CLI currently expects file paths for `add`; recursive directory staging is not implemented.
-- Tree objects are nested recursively for directory contents.
-- Checkout supports switching branches but not detached HEAD mode.
 - Merge, conflict resolution, rename detection, and remote repositories are not implemented.

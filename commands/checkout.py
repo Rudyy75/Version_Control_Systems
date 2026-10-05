@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from core.index import load_index, save_index
-from core.objects import hash_object, read_object
+from core.objects import read_object
 from core.refs import HEAD_PATH, MYGIT_DIR, get_head_commit, require_repository
 from core.trees import tree_from_commit
 
