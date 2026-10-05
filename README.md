@@ -77,9 +77,14 @@ python mygit.py status
 
 Reports:
 
+- `new file staged`: a file is staged for the first time
+- `modified in index`: a committed file has staged changes
+- `deleted from index`: a committed file is staged for removal
 - `modified`: an indexed file has different content on disk
-- `deleted`: an indexed file no longer exists
+- `deleted`: an indexed file no longer exists on disk
 - `untracked`: a file exists on disk but is not in the index
+
+Status compares the last commit, the staging index, and the working directory.
 
 ### Create or list branches
 
@@ -126,7 +131,7 @@ The complete object is compressed with zlib before being stored.
 The implementation uses three object types:
 
 - Blob: raw file contents
-- Tree: file modes, paths, and blob hashes for a snapshot
+- Tree: hierarchical directory entries, where files reference blobs and directories reference trees
 - Commit: tree hash, optional parent hash, author, committer, and message
 
 ### Index
@@ -172,6 +177,10 @@ python path\to\mygit\mygit.py commit -m "update file"
 ## Current Limitations
 
 - The CLI currently expects file paths for `add`; recursive directory staging is not implemented.
-- Tree objects are stored as flat entries rather than nested tree objects.
+- Checkout supports named branches but not detached `HEAD` mode.
+- Merge, conflict resolution, rename detection, and remote repositories are not implemented.
+
+- The CLI currently expects file paths for `add`; recursive directory staging is not implemented.
+- Tree objects are nested recursively for directory contents.
 - Checkout supports switching branches but not detached HEAD mode.
 - Merge, conflict resolution, rename detection, and remote repositories are not implemented.

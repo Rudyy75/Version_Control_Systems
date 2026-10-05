@@ -1,6 +1,12 @@
 from pathlib import Path
 
-from core.refs import MYGIT_DIR, get_current_branch, get_head_commit, update_ref
+from core.refs import (
+    MYGIT_DIR,
+    get_current_branch,
+    get_head_commit,
+    require_repository,
+    update_ref,
+)
 
 
 HEADS_DIR = MYGIT_DIR / "refs" / "heads"
@@ -8,6 +14,9 @@ HEADS_DIR = MYGIT_DIR / "refs" / "heads"
 
 def branch(name: str | None = None):
     """Create a branch or list existing branches."""
+    if not require_repository():
+        return
+
     if name:
         if get_head_commit() is None:
             print("error: cannot create a branch before the first commit")

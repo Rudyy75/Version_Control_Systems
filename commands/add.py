@@ -3,10 +3,14 @@ from pathlib import Path
 
 from core.index import load_index, save_index
 from core.objects import hash_object
+from core.refs import require_repository
 
 
 def add(file_paths: list[str]):
     """Store files as blobs and add them to the staging area."""
+    if not require_repository():
+        return
+
     index = load_index()
 
     for file_name in file_paths:

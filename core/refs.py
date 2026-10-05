@@ -5,6 +5,14 @@ MYGIT_DIR = Path(".mygit")
 HEAD_PATH = MYGIT_DIR / "HEAD"
 
 
+def require_repository() -> bool:
+    """Report whether the current directory contains a MyGit repository."""
+    if not HEAD_PATH.is_file() or not (MYGIT_DIR / "objects").is_dir():
+        print("fatal: not a mygit repository")
+        return False
+    return True
+
+
 def get_current_branch():
     """Return the ref path stored in HEAD."""
     head_contents = HEAD_PATH.read_text(encoding="utf-8").strip()

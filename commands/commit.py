@@ -4,7 +4,8 @@ from datetime import datetime
 
 from core.index import load_index
 from core.objects import hash_object
-from core.refs import get_current_branch, get_head_commit, update_ref
+from core.refs import get_current_branch, get_head_commit, require_repository, update_ref
+from core.trees import build_tree
 
 
 def signature():
@@ -17,20 +18,11 @@ def signature():
 
 def commit(message: str):
     """Create a tree and commit from the current staging area."""
+    if not require_repository():
+        return
+
     index = load_index()
-    tree_entries = []
-
-    for path, entry in sorted(index["entries"].items()):
-        tree_entry = (
-            entry["mode"].encode()
-            + b" "
-            + path.encode()
-            + b"\0"
-            + bytes.fromhex(entry["hash"])
-        )
-        tree_entries.append(tree_entry)
-
-    tree_hash = hash_object(b"".join(tree_entries), "tree")
+    tree_hash = build_tree(index["entries"])
     parent_hash = get_head_commit()
     sig = signature()
 

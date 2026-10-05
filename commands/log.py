@@ -1,9 +1,13 @@
 from core.objects import read_object
 from core.refs import get_head_commit
+from core.refs import require_repository
 
 
 def log():
     """Print commits from the current branch, newest first."""
+    if not require_repository():
+        return
+
     current_hash = get_head_commit()
 
     while current_hash:

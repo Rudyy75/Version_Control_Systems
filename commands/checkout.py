@@ -1,46 +1,19 @@
 from pathlib import Path
 
 from core.index import load_index, save_index
-from core.objects import read_object
-from core.refs import HEAD_PATH, MYGIT_DIR
+from core.objects import hash_object, read_object
+from core.refs import HEAD_PATH, MYGIT_DIR, get_head_commit, require_repository
+from core.trees import tree_from_commit
 
 
 HEADS_DIR = MYGIT_DIR / "refs" / "heads"
 
 
-def read_tree(commit_hash: str):
-    object_type, commit_data = read_object(commit_hash)
-    if object_type != "commit":
-        raise ValueError(f"{commit_hash} is not a commit")
-
-    tree_hash = next(
-        line.removeprefix("tree ")
-        for line in commit_data.decode().splitlines()
-        if line.startswith("tree ")
-    )
-    object_type, tree_data = read_object(tree_hash)
-    if object_type != "tree":
-        raise ValueError(f"{tree_hash} is not a tree")
-
-    entries = {}
-    position = 0
-    while position < len(tree_data):
-        mode_end = tree_data.index(b" ", position)
-        name_end = tree_data.index(b"\0", mode_end)
-        hash_start = name_end + 1
-        hash_end = hash_start + 32
-        path = tree_data[mode_end + 1:name_end].decode()
-        entries[path] = {
-            "hash": tree_data[hash_start:hash_end].hex(),
-            "mode": tree_data[position:mode_end].decode(),
-        }
-        position = hash_end
-
-    return entries
-
-
 def checkout(name: str):
     """Switch to a branch and restore its committed files."""
+    if not require_repository():
+        return
+
     branch_path = HEADS_DIR / name
     if not branch_path.is_file():
         print(f"error: branch does not exist: {name}")
@@ -49,6 +22,13 @@ def checkout(name: str):
     target_commit = branch_path.read_text(encoding="utf-8").strip()
     current_index = load_index()
     current_entries = current_index["entries"]
+    current_commit = get_head_commit()
+
+    if current_commit:
+        committed_entries = tree_from_commit(current_commit)
+        if committed_entries != current_entries:
+            print("error: local changes would be overwritten: staged changes")
+            return
 
     for path, entry in current_entries.items():
         file_path = Path(path)
@@ -59,7 +39,7 @@ def checkout(name: str):
             print(f"error: local changes would be overwritten: {path}")
             return
 
-    target_entries = read_tree(target_commit)
+    target_entries = tree_from_commit(target_commit)
     for path in target_entries:
         if path not in current_entries and Path(path).exists():
             print(f"error: untracked file would be overwritten: {path}")
